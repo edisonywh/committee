@@ -58,7 +58,7 @@ defmodule Mix.Tasks.Committee.Install do
   defp create_config_file do
     @config_path
     |> File.write!(~S"""
-    defmodule YourApp.Commitment do
+    defmodule YourApp.Commit do
       use Committee
 
       # Here's where you can add your Git hooks!
