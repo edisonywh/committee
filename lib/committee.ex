@@ -1,6 +1,10 @@
 defmodule Committee do
   @hooks ~w(pre_commit post_commit)
 
+  def __hooks__ do
+    @hooks
+  end
+
   @moduledoc """
   This module exposes a `__using__/1` that injects default implementation of git hooks
   such as `#{Enum.join(@hooks, ", ")}`.
@@ -11,11 +15,11 @@ defmodule Committee do
     quote do
       @behaviour Committee
 
-      @doc false
+      @impl true
       @spec pre_commit() :: no_return
-      def pre_commit,  do: exit({:shutdown, 0})
+      def pre_commit, do: exit({:shutdown, 0})
 
-      @doc false
+      @impl true
       @spec post_commit() :: no_return
       def post_commit, do: exit({:shutdown, 0})
 
@@ -23,6 +27,6 @@ defmodule Committee do
     end
   end
 
-  @callback pre_commit()  :: no_return
+  @callback pre_commit() :: no_return
   @callback post_commit() :: no_return
 end
