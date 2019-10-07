@@ -12,9 +12,22 @@ defmodule Mix.Tasks.Committee.Runner do
 
     case hook in @hooks do
       true ->
-        apply(mod, String.to_atom(hook), [])
+        case apply(mod, String.to_atom(hook), []) do
+          {:ok, message} ->
+            Mix.shell().info(message)
+
+          {:halt, reason} ->
+            Mix.shell().error("`#{hook}` hook exited with reason: \"#{reason}\"")
+            exit({:shutdown, 1})
+
+          _ ->
+            nil
+        end
+
       false ->
-        Mix.shell().error("Unrecognized hook command, available options are ['#{Enum.join(@hooks, ", ")}']")
+        Mix.shell().error(
+          "Unrecognized hook command, available options are ['#{Enum.join(@hooks, ", ")}']"
+        )
     end
   end
 end
