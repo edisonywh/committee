@@ -60,13 +60,21 @@ defmodule Mix.Tasks.Committee.Install do
     |> File.write!(~S"""
     defmodule YourApp.Commit do
       use Committee
+      import Committee.Helpers, only: [staged_files: 0]
 
       # Here's where you can add your Git hooks!
-      # Return with a non-zero exit code if you want to fail the commit.
+      #
+      # To abort a commit, return in the form of `{:halt, reason}`.
+      # To print a success message, return in the form of `{:ok, message}`.
       #
       # ## Example:
       #
-      #   def pre_commit,  do: exit({:shutdown, 1})
+      #   # This function auto-runs `mix format` on staged files.
+      #   @impl true
+      #   def pre_commit do
+      #     System.cmd("mix", ["format"] ++ staged_files())
+      #     System.cmd("git", ["add"] ++ staged_files())
+      #   end
       #
       # If you want to test your example manually, you can run:
       #
