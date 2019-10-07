@@ -16,11 +16,11 @@ defmodule Committee do
       @behaviour Committee
 
       @impl true
-      @spec pre_commit() :: no_return
+      @spec pre_commit() :: {:ok, String.t()} | {:halt, String.t()} | any()
       def pre_commit, do: exit({:shutdown, 0})
 
       @impl true
-      @spec post_commit() :: no_return
+      @spec post_commit() :: {:ok, String.t()} | {:halt, String.t()} | any()
       def post_commit, do: exit({:shutdown, 0})
 
       defoverridable pre_commit: 0, post_commit: 0
