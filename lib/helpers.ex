@@ -14,6 +14,16 @@ defmodule Committee.Helpers do
     |> String.split("\n", trim: true)
   end
 
+  @doc """
+  This function returns a list of staged files, but takes in a list of atoms/strings
+  to return by file extensions.
+  """
+  @spec staged_files(String.t() | list(String.t())) :: list(String.t())
+  def staged_files(ext) do
+    staged_files()
+    |> Enum.filter(&String.ends_with?(&1, ext))
+  end
+
   @spec branch_name() :: binary
   def branch_name do
     System.cmd("git", ["rev-parse", "--abbrev-ref", "HEAD"])
