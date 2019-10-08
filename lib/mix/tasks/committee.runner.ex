@@ -12,6 +12,8 @@ defmodule Mix.Tasks.Committee.Runner do
 
     case hook in @hooks do
       true ->
+        Mix.shell().info("=== ⚡️ Committee is running your `#{hook}` hook! ===\n")
+
         case apply(mod, String.to_atom(hook), []) do
           {:ok, message} ->
             Mix.shell().info(message)
@@ -23,6 +25,8 @@ defmodule Mix.Tasks.Committee.Runner do
           _ ->
             nil
         end
+
+        Mix.shell().info("\n=== ⚡️ `#{hook}` ran! ===\n")
 
       false ->
         Mix.shell().error(
