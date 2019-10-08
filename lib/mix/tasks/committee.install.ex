@@ -59,7 +59,7 @@ defmodule Mix.Tasks.Committee.Install do
     |> File.write!(~S"""
     defmodule YourApp.Commit do
       use Committee
-      import Committee.Helpers, only: [staged_files: 0]
+      import Committee.Helpers, only: [staged_files: 0, staged_files: 1]
 
       # Here's where you can add your Git hooks!
       #
@@ -71,7 +71,8 @@ defmodule Mix.Tasks.Committee.Install do
       #   # This function auto-runs `mix format` on staged files.
       #   @impl true
       #   def pre_commit do
-      #     System.cmd("mix", ["format"] ++ staged_files())
+      #     IO.puts "⚡️Committee is running your `pre_commit` hook!"
+      #     System.cmd("mix", ["format"] ++ staged_files([".ex", ".exs"]))
       #     System.cmd("git", ["add"] ++ staged_files())
       #   end
       #
