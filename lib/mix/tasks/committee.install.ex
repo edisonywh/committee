@@ -56,7 +56,7 @@ defmodule Mix.Tasks.Committee.Install do
 
   defp create_config_file do
     @config_path
-    |> File.write!(~S"""
+    |> File.write!(~s"""
     defmodule YourApp.Commit do
       use Committee
       import Committee.Helpers, only: [staged_files: 0, staged_files: 1]
@@ -68,10 +68,11 @@ defmodule Mix.Tasks.Committee.Install do
       #
       # ## Example:
       #
-      #   # This function auto-runs `mix format` on staged files.
       #   @impl true
+      #   @doc \"\"\"
+      #   This function auto-runs `mix format` on staged files.
+      #   \"\"\"
       #   def pre_commit do
-      #     IO.puts "⚡️Committee is running your `pre_commit` hook!"
       #     System.cmd("mix", ["format"] ++ staged_files([".ex", ".exs"]))
       #     System.cmd("git", ["add"] ++ staged_files())
       #   end
