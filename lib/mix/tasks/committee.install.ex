@@ -3,9 +3,8 @@ defmodule Mix.Tasks.Committee.Install do
 
   @shortdoc "Creates a `commit.exs` file and generate executable for git hooks."
 
-  @config_file_name "commit.exs"
-  @config_path Path.expand(@config_file_name)
-  @target_path Path.expand(".git/hooks")
+  @config_path "./commit.exs"
+  @target_path ".git/hooks"
 
   @hooks Committee.__hooks__()
 
