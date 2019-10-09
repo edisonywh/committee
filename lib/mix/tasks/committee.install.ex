@@ -34,6 +34,11 @@ defmodule Mix.Tasks.Committee.Install do
   end
 
   defp create_hook(file, hook) when hook in @hooks do
+    if File.exists?(file) do
+      File.rename!(file, "#{file}.old")
+      Mix.shell().info("Existing #{hook} file renamed to #{file}.old..")
+    end
+
     File.write!(file, template_for(hook))
 
     make_executable(file)
