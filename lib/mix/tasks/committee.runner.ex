@@ -7,6 +7,11 @@ defmodule Mix.Tasks.Committee.Runner do
 
   @impl true
   def run(argv) do
+    if not File.exists?(@config_file_name) do
+      Mix.shell().error("#{@config_file_name} does not exist!")
+      exit({:shutdown, 1})
+    end
+
     {mod, _bytecode} = Code.compile_file(@config_file_name) |> hd
     hook = hd(argv)
 

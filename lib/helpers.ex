@@ -9,9 +9,9 @@ defmodule Committee.Helpers do
   """
   @spec staged_files() :: list(String.t())
   def staged_files do
-    System.cmd("git", ["diff", "--name-only", "--cached"])
+    System.cmd("git", ["diff", "-z", "--name-only", "--staged"])
     |> elem(0)
-    |> String.split("\n", trim: true)
+    |> String.split("\0", trim: true)
   end
 
   @doc """
