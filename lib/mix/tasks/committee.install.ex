@@ -1,12 +1,10 @@
 defmodule Mix.Tasks.Committee.Install do
   use Mix.Task
+  alias Committee.Hooks
 
   @shortdoc "Creates a `commit.exs` file and generate executable for git hooks."
 
   @config_path "./commit.exs"
-  @target_path ".git/hooks"
-
-  @hooks Committee.__hooks__()
 
   @impl true
   def run(_) do
@@ -19,44 +17,8 @@ defmodule Mix.Tasks.Committee.Install do
         create_config_file()
 
         Mix.shell().info("Generating git hooks now..")
-        create_git_hooks()
+        Hooks.create_hooks()
     end
-  end
-
-  defp create_git_hooks(), do: @hooks |> create_hooks()
-
-  defp create_hooks(hooks) when is_list(hooks) do
-    Enum.map(hooks, fn hook ->
-      @target_path
-      |> Path.join(snake_to_kebab(hook))
-      |> create_hook(hook)
-    end)
-  end
-
-  defp create_hook(file, hook) when hook in @hooks do
-    if File.exists?(file) do
-      File.rename!(file, "#{file}.old")
-      Mix.shell().info("Existing #{hook} file renamed to #{file}.old..")
-    end
-
-    File.write!(file, template_for(hook))
-
-    make_executable(file)
-  end
-
-  defp template_for(hook) do
-    ~s"""
-    #!/bin/sh
-
-    mix committee.runner #{hook}
-    """
-  end
-
-  defp make_executable(file), do: System.cmd("chmod", ["+x", file])
-
-  # Git hooks have to be in kebab case
-  defp snake_to_kebab(string) when is_binary(string) do
-    string |> String.replace("_", "-")
   end
 
   defp create_config_file do
