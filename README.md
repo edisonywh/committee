@@ -32,11 +32,11 @@ end
 
 *Documentation can be also be found over on [HexDocs](https://hexdocs.pm/committee).*
 
-> **Warning**: `Committee` will override your existing hooks. PRs to backup hooks are welcome.
-
 After installing `Committee`, all you have to do is run
 
 > `mix committee.install`
+
+*Your existing git hooks will be backed-up and renamed from `hook` to `hook.old`*
 
 You should see a `commit.exs` file being generated, that's where you'll be writing your hooks.
 
@@ -64,17 +64,18 @@ end
 
 To run code for a hook, write a function with the same name (in `snake_case`) as that hook. For a full list of git hooks in the wild, [checkout this list over here](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks).
 
-To abort a commit, return in the form of `{:halt, reason}`.
-To print a success message, return in the form of `{:ok, message}`.
+To **abort** a commit, return in the form of `{:halt, reason}`.
+To **print** a success message, return in the form of `{:ok, message}`.
 
-For a list of `Committee` supported hooks, checkout `Comittee.__hooks__/0`
+If you find that Committee does not do what you want (do let me know how to improve!) and you want to stop using it, you can run the built-in uninstallation task: `mix committee.uninstall`. **This will restore your existing hooks backup too**.
 
+For a list of `Committee` supported hooks, checkout `Committee.__hooks__/0`
 For a list of `Committee` provided helpers (such as `staged_files/0`, `branch_name/0`, checkout `Committee.Helpers`)
 
-*Currently only `pre_commit` and `post_commit` are supported, this is mostly because I haven't tested the other ones, rather than any technical limitation, but I don't see why it won't work for the others.*
+*Currently only `pre_commit` and `post_commit` are supported, this is mostly because I haven't tested the other ones, rather than any technical limitation, but I don't see why it won't work for the others. PRs are welcomed!*
 
 ### What are git hooks?
-If you're reading this, you're probably familiar with Git. We are all used to terms like `commit`, `rebase`, but did you know what Git ships with a hook/callback when you run these actions?
+If you're reading this, you're probably familiar with Git. We are all used to terms like `commit`, `rebase`, but did you know that Git ships with the ability to run a hook/callback when you run these actions?
 
 This effectively means you can write code that gets executed when you do a `git commit`, or when you're commencing a `rebase`. Exciting innit? :)
 
