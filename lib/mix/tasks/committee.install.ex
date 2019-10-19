@@ -2,18 +2,18 @@ defmodule Mix.Tasks.Committee.Install do
   use Mix.Task
   alias Committee.Hooks
 
-  @shortdoc "Creates a `commit.exs` file and generate executable for git hooks."
+  @shortdoc "Creates a `.committee.exs` file and generate executable for git hooks."
 
-  @config_path "./commit.exs"
+  @config_path "./.committee.exs"
 
   @impl true
   def run(_) do
     case File.exists?(@config_path) do
       true ->
-        Mix.shell().info("You already have a `commit.exs`! Happy committing :)")
+        Mix.shell().info("You already have a `.committee.exs`! Happy committing :)")
 
       false ->
-        Mix.shell().info("Generating `commit.exs` now..")
+        Mix.shell().info("Generating `.committee.exs` now..")
         create_config_file()
 
         Mix.shell().info("Generating git hooks now..")

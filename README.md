@@ -38,7 +38,7 @@ After installing `Committee`, all you have to do is run
 
 *Your existing git hooks will be backed-up and renamed from `hook` to `hook.old`*
 
-You should see a `commit.exs` file being generated, that's where you'll be writing your hooks.
+You should see a `.committee.exs` file being generated, that's where you'll be writing your hooks.
 
 The file should look something like this:
 
@@ -119,7 +119,7 @@ Also, you dont have to care about things like making a file executable. `Committ
 
 `Committee` exposes an easy mix task to install itself.
 
-To share it with your team, all you have to do is to put `mix committee.install` in one of your onboarding script. **It's a one-time installation**, and from then on, any updates you make to `commit.exs` (`Committee`'s configuration file) will become **immediately available to your team mates**.
+To share it with your team, all you have to do is to put `mix committee.install` in one of your onboarding script. **It's a one-time installation**, and from then on, any updates you make to `.committee.exs` (`Committee`'s configuration file) will become **immediately available to your team mates**.
 
 *No fuss, no muss.*
 
@@ -146,7 +146,7 @@ There are few more Elixir-centric packages, like:
 
 They all look great, but all hinges on using `config.exs` to do configuration <sup>*Now that I'm writing this out, I realised I'm the outlier here..*</sup>, which works, but I decided to be a little bit more creative, and take this Elixir thing a step further.
 
-Thus born `Committee`, which allows you to write any Elixir code in a `commit.exs` file, because why not?
+Thus born `Committee`, which allows you to write any Elixir code in a `.committee.exs` file, because why not?
 
 > <sup>1</sup> This is not always the case, you can change the [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix)) to run your code with other shell/languages, such as `ruby`.
 

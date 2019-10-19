@@ -2,7 +2,7 @@ defmodule Mix.Tasks.Committee.Runner do
   use Mix.Task
 
   @shortdoc "Runner for Git hooks"
-  @config_file_name "commit.exs"
+  @config_file_name ".committee.exs"
   @hooks Committee.__hooks__()
 
   @impl true
