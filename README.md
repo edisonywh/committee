@@ -1,5 +1,7 @@
 # Committee
 
+[![Build Status](https://github.com/edisonywh/committee/workflows/CI/badge.svg)](https://github.com/edisonywh/committee/actions)
+
 > **Reminder**: While `Committee` is working great for my own use-case, there can be occasional bugs every now and then, if your workflow rely heavily on a Git workflow, proceed at your own risk. Otherwise a PR is very much welcomed!
 ---
 
