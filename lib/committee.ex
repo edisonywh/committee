@@ -9,7 +9,7 @@ defmodule Committee do
   This module exposes a `__using__/1` that injects default implementation of git hooks
   such as `#{Enum.join(@hooks, ", ")}`.
 
-  Users are expected to override them in `commit.exs` (created via `mix committee.install`).
+  Users are expected to override them in `.committee.exs` (created via `mix committee.install`).
   """
   defmacro __using__(_opts) do
     quote do
