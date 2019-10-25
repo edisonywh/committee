@@ -68,4 +68,114 @@ defmodule CommitteeTest do
       end)
     end
   end
+
+  describe "uninstall" do
+    test "uninstall the hooks", context do
+      in_tmp(context.test, fn ->
+        System.cmd("git", ["init"])
+
+        hook_content = """
+        #!/bin/sh
+        echo 'hook'
+        """
+
+        backup_content = """
+        #!/bin/sh
+        echo 'backup'
+        """
+
+        File.touch!(".committee.exs")
+        File.write!(".git/hooks/pre-commit", hook_content)
+        File.write!(".git/hooks/post-commit", hook_content)
+        File.write!(".git/hooks/pre-commit.old", backup_content)
+        File.write!(".git/hooks/post-commit.old", backup_content)
+
+        Mix.Tasks.Committee.Uninstall.run([])
+
+        assert_received {:mix_shell, :info, ["Removing `.committee.exs` now.."]}
+        assert_received {:mix_shell, :info, ["Looking for hooks to delete.."]}
+        assert_received {:mix_shell, :info, ["Removing .git/hooks/pre-commit.."]}
+        assert_received {:mix_shell, :info, ["Removing .git/hooks/post-commit.."]}
+        assert_received {:mix_shell, :info, ["Looking for backed up hooks to restore.."]}
+        assert_received {:mix_shell, :info, ["Restoring .git/hooks/pre-commit.old.."]}
+        assert_received {:mix_shell, :info, ["Restoring .git/hooks/post-commit.old.."]}
+
+        assert File.exists?(".committee.exs") == false
+
+        assert File.exists?(".git/hooks/pre-commit.old") == false
+        assert File.exists?(".git/hooks/post-commit.old") == false
+
+        assert File.read!(".git/hooks/pre-commit") == backup_content
+        assert File.read!(".git/hooks/post-commit") == backup_content
+      end)
+    end
+
+    test ".committee.exs not found", context do
+      in_tmp(context.test, fn ->
+        System.cmd("git", ["init"])
+
+        hook_content = """
+        #!/bin/sh
+        echo 'hook'
+        """
+
+        backup_content = """
+        #!/bin/sh
+        echo 'backup'
+        """
+
+        File.write!(".git/hooks/pre-commit", hook_content)
+        File.write!(".git/hooks/post-commit", hook_content)
+        File.write!(".git/hooks/pre-commit.old", backup_content)
+        File.write!(".git/hooks/post-commit.old", backup_content)
+
+        Mix.Tasks.Committee.Uninstall.run([])
+
+        assert_received {:mix_shell, :info, ["`.committee.exs` not found.."]}
+      end)
+    end
+
+    test "hooks not found", context do
+      in_tmp(context.test, fn ->
+        System.cmd("git", ["init"])
+
+        backup_content = """
+        #!/bin/sh
+        echo 'backup'
+        """
+
+        File.touch!(".committee.exs")
+        File.write!(".git/hooks/pre-commit.old", backup_content)
+        File.write!(".git/hooks/post-commit.old", backup_content)
+
+        Mix.Tasks.Committee.Uninstall.run([])
+
+        assert_received {:mix_shell, :info, [".git/hooks/pre-commit not found.."]}
+        assert_received {:mix_shell, :info, [".git/hooks/post-commit not found.."]}
+      end)
+    end
+
+    test "backups not found", context do
+      in_tmp(context.test, fn ->
+        System.cmd("git", ["init"])
+
+        hook_content = """
+        #!/bin/sh
+        echo 'hook'
+        """
+
+        File.touch!(".committee.exs")
+        File.write!(".git/hooks/pre-commit", hook_content)
+        File.write!(".git/hooks/post-commit", hook_content)
+
+        Mix.Tasks.Committee.Uninstall.run([])
+
+        assert_received {:mix_shell, :info, [".git/hooks/pre-commit.old not found.."]}
+        assert_received {:mix_shell, :info, [".git/hooks/post-commit.old not found.."]}
+
+        assert File.exists?(".git/hooks/pre-commit") == false
+        assert File.exists?(".git/hooks/post-commit") == false
+      end)
+    end
+  end
 end
