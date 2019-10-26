@@ -1,6 +1,7 @@
 defmodule CommitteeTest do
   use ExUnit.Case
   import Committee.TestHelpers
+  import ExUnit.CaptureLog
 
   setup do
     Mix.shell(Mix.Shell.Process)
@@ -175,6 +176,163 @@ defmodule CommitteeTest do
 
         assert File.exists?(".git/hooks/pre-commit") == false
         assert File.exists?(".git/hooks/post-commit") == false
+      end)
+    end
+  end
+
+  describe "runner" do
+    test "success", context do
+      in_tmp(context.test, fn ->
+        committee_content = """
+        defmodule Committee.Commit do
+          use Committee
+          require Logger
+
+          def pre_commit do
+            Logger.info("Elixir is pure love!")
+
+            {:ok, "It works!"}
+          end
+        end
+        """
+
+        File.write!(".committee.exs", committee_content)
+
+        assert capture_log(fn ->
+                 Mix.Tasks.Committee.Runner.run(["pre_commit"])
+               end) =~ "Elixir is pure love!"
+
+        assert_received {:mix_shell, :info,
+                         ["=== ⚡️ Committee is running your `pre_commit` hook! ===\n"]}
+
+        assert_received {:mix_shell, :info, ["It works!"]}
+        assert_received {:mix_shell, :info, ["\n=== ⚡️ `pre_commit` ran! ===\n"]}
+      end)
+    end
+
+    test "config file not exists", context do
+      in_tmp(context.test, fn ->
+        Mix.Tasks.Committee.Runner.run(["pre_commit"])
+
+        assert_received {:mix_shell, :info,
+                         [
+                           "Committee needs a `.committee.exs` in order to work, but you don't seem to have one.\nIf you want to remove Committee, you can run the built-in `mix committee.uninstall` to cleanly uninstall it.\n"
+                         ]}
+      end)
+    end
+
+    test "multiple module in the file", context do
+      in_tmp(context.test, fn ->
+        committee_content = """
+        defmodule Committee.MultipleModules1 do
+          use Committee
+
+          def pre_commit do
+            {:ok, "It works!"}
+          end
+        end
+        defmodule Committee.MultipleModules do
+          use Committee
+
+          def pre_commit do
+            {:ok, "Another one!"}
+          end
+        end
+        """
+
+        File.write!(".committee.exs", committee_content)
+        Mix.Tasks.Committee.Runner.run(["pre_commit"])
+
+        assert_received {:mix_shell, :info,
+                         ["=== ⚡️ Committee is running your `pre_commit` hook! ===\n"]}
+
+        assert_received {:mix_shell, :info, ["It works!"]}
+        assert_received {:mix_shell, :info, ["\n=== ⚡️ `pre_commit` ran! ===\n"]}
+      end)
+    end
+
+    test "invalid hook", context do
+      in_tmp(context.test, fn ->
+        committee_content = """
+        defmodule Committee.InvalidHooks do
+          use Committee
+
+          def pre_commit do
+            {:ok, "It works!"}
+          end
+        end
+        """
+
+        File.write!(".committee.exs", committee_content)
+        Mix.Tasks.Committee.Runner.run(["invalid_hooks"])
+
+        assert_received {:mix_shell, :error,
+                         [
+                           "Unrecognized hook command, available options are ['pre_commit, post_commit']"
+                         ]}
+      end)
+    end
+
+    test "multiple arguments", context do
+      in_tmp(context.test, fn ->
+        committee_content = """
+        defmodule Committee.MultipleArguments do
+          use Committee
+
+          def pre_commit do
+            {:ok, "It works!"}
+          end
+        end
+        """
+
+        File.write!(".committee.exs", committee_content)
+        Mix.Tasks.Committee.Runner.run(["pre_commit", "another_one"])
+
+        assert_received {:mix_shell, :info,
+                         ["=== ⚡️ Committee is running your `pre_commit` hook! ===\n"]}
+
+        assert_received {:mix_shell, :info, ["It works!"]}
+        assert_received {:mix_shell, :info, ["\n=== ⚡️ `pre_commit` ran! ===\n"]}
+      end)
+    end
+
+    test "missing arguments", context do
+      in_tmp(context.test, fn ->
+        committee_content = """
+        defmodule Committee.MissingArguments do
+          use Committee
+
+          def pre_commit do
+            {:ok, "It works!"}
+          end
+        end
+        """
+
+        File.write!(".committee.exs", committee_content)
+
+        assert_raise ArgumentError, fn ->
+          Mix.Tasks.Committee.Runner.run([])
+        end
+      end)
+    end
+
+    test "hook without message", context do
+      in_tmp(context.test, fn ->
+        committee_content = """
+        defmodule Committee.HookWithoutMessage do
+          use Committee
+
+          def pre_commit do
+            # nothing
+          end
+        end
+        """
+
+        File.write!(".committee.exs", committee_content)
+
+        Mix.Tasks.Committee.Runner.run(["pre_commit"])
+
+        refute_received {:mix_shell, _, _}
       end)
     end
   end

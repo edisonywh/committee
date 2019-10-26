@@ -41,7 +41,7 @@ defmodule Committee.HelpersTest do
 
         assert Helpers.branch_name() == "master"
 
-        System.cmd("git", ["checkout", "-b", "my-cool-branch"])
+        System.cmd("git", ["checkout", "-qb", "my-cool-branch"])
 
         assert Helpers.branch_name() == "my-cool-branch"
       end)
