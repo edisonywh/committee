@@ -15,7 +15,7 @@ defmodule Committee.Hooks do
 
   defp create_hook(file, hook) when hook in @hooks do
     if File.exists?(file) do
-      File.rename!(file, "#{file}.old")
+      :ok = File.rename(file, "#{file}.old")
       Mix.shell().info("Existing #{hook} file renamed to #{file}.old..")
     end
 
@@ -53,7 +53,7 @@ defmodule Committee.Hooks do
 
     if File.exists?(backup_file) do
       Mix.shell().info("Restoring #{backup_file}..")
-      File.rename!(backup_file, file)
+      :ok = File.rename(backup_file, file)
     else
       Mix.shell().info("#{backup_file} not found..")
     end
