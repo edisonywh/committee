@@ -18,6 +18,10 @@ jobs:
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
+      - name: Configure git with fake data
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
       - name: Install Dependencies
         run: mix deps.get
       - name: Check Formatted

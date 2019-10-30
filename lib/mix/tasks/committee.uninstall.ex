@@ -4,7 +4,7 @@ defmodule Mix.Tasks.Committee.Uninstall do
 
   @shortdoc "Remove files created by `mix committee.install` and restores the backup"
 
-  @config_path "./.commitee.exs"
+  @config_path "./.committee.exs"
 
   @impl true
   def run(_) do
@@ -16,11 +16,11 @@ defmodule Mix.Tasks.Committee.Uninstall do
   defp remove_config_file do
     case File.exists?(@config_path) do
       true ->
-        Mix.shell().info("Removing `.commitee.exs` now..")
+        Mix.shell().info("Removing `.committee.exs` now..")
         File.rm!(@config_path)
 
       false ->
-        Mix.shell().info("`.commitee.exs` not found..")
+        Mix.shell().info("`.committee.exs` not found..")
     end
   end
 end
