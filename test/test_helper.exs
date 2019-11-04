@@ -20,3 +20,9 @@ defmodule Committee.TestHelpers do
     |> Path.join(to_string(which))
   end
 end
+
+defmodule Committee.MixTaskStub do
+  def run(task) do
+    send(self(), task)
+  end
+end

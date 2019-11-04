@@ -9,6 +9,14 @@ defmodule CommitteeTest do
     :ok
   end
 
+  describe "bootstrap" do
+    test "runs both install and install_hooks", _context do
+      Mix.Tasks.Committee.Bootstrap.run([Committee.MixTaskStub])
+      assert_receive("committee.install")
+      assert_receive("committee.install_hooks")
+    end
+  end
+
   describe "install" do
     test "install the hooks", context do
       in_tmp(context.test, fn ->
@@ -17,14 +25,8 @@ defmodule CommitteeTest do
         Mix.Tasks.Committee.Install.run([])
 
         assert_received {:mix_shell, :info, ["Generating `.committee.exs` now.."]}
-        assert_received {:mix_shell, :info, ["Generating git hooks now.."]}
 
         assert File.read!(".committee.exs") =~ "use Committee"
-        assert File.read!(".git/hooks/pre-commit") =~ "mix committee.runner pre_commit"
-        assert File.read!(".git/hooks/post-commit") =~ "mix committee.runner post_commit"
-
-        assert executable?(".git/hooks/pre-commit") == true
-        assert executable?(".git/hooks/post-commit") == true
       end)
     end
 
@@ -37,9 +39,24 @@ defmodule CommitteeTest do
 
         assert_received {:mix_shell, :info,
                          ["You already have a `.committee.exs`! Happy committing :)"]}
+      end)
+    end
+  end
 
-        assert File.exists?(".git/hooks/pre-commit") == false
-        assert File.exists?(".git/hooks/post-commit") == false
+  describe "install_hooks" do
+    test "install the hooks", context do
+      in_tmp(context.test, fn ->
+        System.cmd("git", ["init"])
+
+        Mix.Tasks.Committee.InstallHooks.run([])
+
+        assert_received {:mix_shell, :info, ["Generating git hooks now.."]}
+
+        assert File.read!(".git/hooks/pre-commit") =~ "mix committee.runner pre_commit"
+        assert File.read!(".git/hooks/post-commit") =~ "mix committee.runner post_commit"
+
+        assert executable?(".git/hooks/pre-commit") == true
+        assert executable?(".git/hooks/post-commit") == true
       end)
     end
 
@@ -49,9 +66,8 @@ defmodule CommitteeTest do
         File.touch!(".git/hooks/pre-commit")
         File.touch!(".git/hooks/post-commit")
 
-        Mix.Tasks.Committee.Install.run([])
+        Mix.Tasks.Committee.InstallHooks.run([])
 
-        assert_received {:mix_shell, :info, ["Generating `.committee.exs` now.."]}
         assert_received {:mix_shell, :info, ["Generating git hooks now.."]}
 
         assert_received {:mix_shell, :info,
@@ -63,7 +79,6 @@ defmodule CommitteeTest do
         assert File.exists?(".git/hooks/pre-commit.old") == true
         assert File.exists?(".git/hooks/post-commit.old") == true
 
-        assert File.read!(".committee.exs") =~ "use Committee"
         assert File.read!(".git/hooks/pre-commit") =~ "mix committee.runner pre_commit"
         assert File.read!(".git/hooks/post-commit") =~ "mix committee.runner post_commit"
       end)
