@@ -15,10 +15,10 @@ defmodule Mix.Tasks.Committee.Install do
       false ->
         Mix.shell().info("Generating `.committee.exs` now..")
         create_config_file()
-
-        Mix.shell().info("Generating git hooks now..")
-        Hooks.create_hooks()
     end
+
+    Mix.shell().info("Generating git hooks now..")
+    Hooks.create_hooks()
   end
 
   defp create_config_file do
