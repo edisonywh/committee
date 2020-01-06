@@ -18,6 +18,8 @@ defmodule CommitteeTest do
 
         assert_received {:mix_shell, :info, ["Generating `.committee.exs` now.."]}
         assert_received {:mix_shell, :info, ["Generating git hooks now.."]}
+        assert_received {:mix_shell, :info, ["Generating pre_commit hook.."]}
+        assert_received {:mix_shell, :info, ["Generating post_commit hook.."]}
 
         assert File.read!(".committee.exs") =~ "use Committee"
         assert File.read!(".git/hooks/pre-commit") =~ "mix committee.runner pre_commit"
@@ -38,8 +40,37 @@ defmodule CommitteeTest do
         assert_received {:mix_shell, :info,
                          ["You already have a `.committee.exs`! Happy committing :)"]}
 
-        assert File.exists?(".git/hooks/pre-commit") == false
-        assert File.exists?(".git/hooks/post-commit") == false
+        assert_received {:mix_shell, :info, ["Generating git hooks now.."]}
+        assert_received {:mix_shell, :info, ["Generating pre_commit hook.."]}
+        assert_received {:mix_shell, :info, ["Generating post_commit hook.."]}
+
+        assert File.exists?(".git/hooks/pre-commit") == true
+        assert File.exists?(".git/hooks/post-commit") == true
+      end)
+    end
+
+    test "existing committee hooks", context do
+      in_tmp(context.test, fn ->
+        committee_hook = """
+          #!/bin/sh
+
+          # committee
+
+          echo 'existing'
+        """
+
+        System.cmd("git", ["init"])
+        File.touch!(".committee.exs")
+        File.write!(".git/hooks/pre-commit", committee_hook)
+
+        Mix.Tasks.Committee.Install.run([])
+
+        assert_received {:mix_shell, :info, ["Generating git hooks now.."]}
+        refute_received {:mix_shell, :info, ["Generating pre_commit hook.."]}
+
+        assert File.exists?(".git/hooks/pre-commit.old") == false
+
+        assert File.read!(".git/hooks/pre-commit") =~ "echo 'existing'"
       end)
     end
 
@@ -59,6 +90,9 @@ defmodule CommitteeTest do
 
         assert_received {:mix_shell, :info,
                          ["Existing post_commit file renamed to .git/hooks/post-commit.old.."]}
+
+        assert_received {:mix_shell, :info, ["Generating pre_commit hook.."]}
+        assert_received {:mix_shell, :info, ["Generating post_commit hook.."]}
 
         assert File.exists?(".git/hooks/pre-commit.old") == true
         assert File.exists?(".git/hooks/post-commit.old") == true

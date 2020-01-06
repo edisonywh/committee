@@ -5,20 +5,32 @@ defmodule Committee.Hooks do
 
   @hooks Committee.__hooks__()
   @target_path ".git/hooks"
+  @identifier "# committee"
 
   @doc """
   Create the hooks files, backing up existing ones.
   """
   def create_hooks(hooks \\ @hooks) when is_list(hooks) do
-    for_each_hook(hooks, &create_hook/2)
+    for_each_hook(hooks, &setup_hook/2)
   end
 
-  defp create_hook(file, hook) when hook in @hooks do
+  defp setup_hook(file, hook) when hook in @hooks do
     if File.exists?(file) do
-      :ok = File.rename(file, "#{file}.old")
-      Mix.shell().info("Existing #{hook} file renamed to #{file}.old..")
-    end
+      content = File.read!(file)
 
+      unless String.contains?(content, @identifier) do
+        :ok = File.rename(file, "#{file}.old")
+        Mix.shell().info("Existing #{hook} file renamed to #{file}.old..")
+
+        create_hook(file, hook)
+      end
+    else
+      create_hook(file, hook)
+    end
+  end
+
+  defp create_hook(file, hook) do
+    Mix.shell().info("Generating #{hook} hook..")
     File.write!(file, template_for(hook))
     make_executable(file)
   end
@@ -71,6 +83,8 @@ defmodule Committee.Hooks do
   defp template_for(hook) do
     ~s"""
     #!/bin/sh
+
+    #{@identifier}
 
     mix committee.runner #{hook}
     """
