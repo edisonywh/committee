@@ -54,8 +54,7 @@ defmodule CommitteeTest do
         committee_hook = """
           #!/bin/sh
 
-          # committee
-          # version:old
+          # committee:old
         """
 
         System.cmd("git", ["init"])
@@ -73,8 +72,8 @@ defmodule CommitteeTest do
 
         assert_received {:mix_shell, :info, [^message]}
 
-        assert File.read!(".git/hooks/pre-commit.old") =~ "version:old"
-        assert File.read!(".git/hooks/pre-commit") =~ "version:#{current_version}"
+        assert File.read!(".git/hooks/pre-commit.old") =~ "committee:old"
+        assert File.read!(".git/hooks/pre-commit") =~ "committee:#{current_version}"
       end)
     end
 
@@ -85,8 +84,7 @@ defmodule CommitteeTest do
         committee_hook = """
           #!/bin/sh
 
-          # committee
-          # version:#{current_version}
+          # committee:#{current_version}
         """
 
         System.cmd("git", ["init"])
@@ -102,7 +100,7 @@ defmodule CommitteeTest do
 
         assert File.exists?(".git/hooks/pre-commit.old") == false
 
-        assert File.read!(".git/hooks/pre-commit") =~ "version:#{current_version}"
+        assert File.read!(".git/hooks/pre-commit") =~ "committee:#{current_version}"
       end)
     end
 

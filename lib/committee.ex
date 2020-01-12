@@ -8,7 +8,7 @@ defmodule Committee do
   def __hooks__, do: @hooks
 
   @doc """
-  Return the current version of Committee
+  Return the current hook format version used by Committee
   """
   def __version__, do: @version
 

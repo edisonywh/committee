@@ -106,8 +106,7 @@ defmodule Committee.Hooks do
     ~s"""
     #!/bin/sh
 
-    #{@identifier}
-    # version:#{Committee.__version__()}
+    #{@identifier}:#{Committee.__version__()}
 
     mix committee.runner #{hook}
     """
@@ -123,7 +122,7 @@ defmodule Committee.Hooks do
   defp generated_by_committee?(content), do: String.contains?(content, @identifier)
 
   defp hook_version(content) do
-    case Regex.run(~r/(?<=version:).+/, content) do
+    case Regex.run(~r/(?<=#{@identifier}:).+/, content) do
       nil ->
         nil
 
