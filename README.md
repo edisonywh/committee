@@ -25,7 +25,7 @@ Get the latest version from [Hex](https://hex.pm/packages/committee)
 ```elixir
 def deps do
   [
-    {:committee, "~> 0.1.2", only: :dev, runtime: false}
+    {:committee, "~> 1.0.0", only: :dev, runtime: false}
   ]
 end
 ```
