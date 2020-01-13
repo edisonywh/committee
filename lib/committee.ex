@@ -1,9 +1,16 @@
 defmodule Committee do
   @hooks ~w(pre_commit post_commit)
+  @version "1"
 
-  def __hooks__ do
-    @hooks
-  end
+  @doc """
+  Return a list of the currently supported hooks.
+  """
+  def __hooks__, do: @hooks
+
+  @doc """
+  Return the current hook format version used by Committee
+  """
+  def __version__, do: @version
 
   @moduledoc """
   This module exposes a `__using__/1` that injects default implementation of git hooks
